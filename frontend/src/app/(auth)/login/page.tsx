@@ -1,292 +1,121 @@
-'use client'
+"use client"
 
-import React, { useState, useRef, useEffect } from 'react'
-import { Phone, ShieldCheck, User, GraduationCap } from 'lucide-react'
+import React, { FormEvent, useState } from "react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { RippleButton } from "@/components/ui/ripple-button"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import MagicCard from "@/components/ui/magic-card"
 
-export default function AuthPage() {
-  const [step, setStep] = useState<'entry' | 'otp' | 'profile'>('entry')
-  const [phone, setPhone] = useState('')
-  const [otp, setOtp] = useState<string[]>(['', '', '', '', '', ''])
-  const otpRefs = useRef<Array<HTMLInputElement | null>>([])
-  const [sending, setSending] = useState(false)
-  const [verifying, setVerifying] = useState(false)
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [departmentQuery, setDepartmentQuery] = useState('')
-  const [department, setDepartment] = useState('')
-  const [regNo, setRegNo] = useState('')
-  const [profileSubmitting, setProfileSubmitting] = useState(false)
-  const [regError, setRegError] = useState('')
-  const departments = ['SWE', 'CSE', 'EEE', 'PHY', 'CEP', 'MAT', 'CHE', 'BBA', 'ENG', 'BIO']
+const API_BASE_URL = "http://localhost:5000/auth"
 
-  useEffect(() => {
-    if (step === 'otp') {
-      otpRefs.current[0]?.focus()
-    }
-  }, [step])
+export default function LoginPage() {
+  const router = useRouter()
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+  const [success, setSuccess] = useState("")
 
-  function formatPhoneInput(value: string) {
-    // keep only digits, allow up to 11
-    return value.replace(/\D/g, '').slice(0, 11)
+  const saveJwtToCookie = (jwt: string) => {
+    const maxAge = 60 * 60 * 24 * 7
+    document.cookie = `token=${encodeURIComponent(jwt)}; path=/; max-age=${maxAge}; samesite=lax`
   }
 
-  async function handleSendOtp() {
-    if (phone.length < 10) {
-      alert('Enter a valid phone number.')
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault()
+    setError("")
+    setSuccess("")
+
+    if (!email || !password) {
+      setError("Please enter both email and password.")
       return
     }
-    setSending(true)
-    // simulate API call
-    await new Promise((r) => setTimeout(r, 800))
-    setSending(false)
-    setStep('otp')
-  }
 
-  function handleOtpChange(i: number, v: string) {
-    if (!/^\d?$/.test(v)) return
-    const next = [...otp]
-    next[i] = v
-    setOtp(next)
-    if (v && i < 5) {
-      otpRefs.current[i + 1]?.focus()
-    }
-  }
+    setLoading(true)
+    try {
+      const res = await fetch(`${API_BASE_URL}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      })
 
-  async function handleVerifyOtp() {
-    if (otp.some((d) => d === '')) {
-      alert('Enter the 6-digit OTP.')
-      return
-    }
-    setVerifying(true)
-    // simulate verification
-    await new Promise((r) => setTimeout(r, 800))
-    setVerifying(false)
-    setStep('profile')
-  }
+      const data = await res.json().catch(() => null)
 
-  function filteredDepartments() {
-    const q = departmentQuery.trim().toLowerCase()
-    return departments.filter((d) => d.toLowerCase().includes(q))
-  }
-
-  function validateRegNo(value: string) {
-    const digits = value.replace(/\D/g, '')
-    setRegNo(digits)
-    if (digits.length === 10) {
-      // simple SUST-style check: starts with '20' and 10 digits total
-      if (!/^20\d{8}$/.test(digits)) {
-        setRegError('Registration must be a 10-digit SUST number starting with "20".')
-      } else {
-        setRegError('')
+      if (!res.ok) {
+        setError(data?.message ?? "Login failed. Check credentials.")
+        return
       }
-    } else {
-      setRegError('')
-    }
-  }
 
-  async function handleCompleteProfile(e?: React.FormEvent) {
-    e?.preventDefault()
-    if (!name || !email || !department || regNo.length !== 10 || !!regError) {
-      alert('Please fill all fields correctly.')
-      return
+      const jwt = data?.token ?? data?.jwt ?? data?.accessToken
+      if (typeof jwt === "string" && jwt.length > 0) {
+        saveJwtToCookie(jwt)
+      }
+
+      setSuccess(data?.message ?? "Logged in successfully.")
+      // redirect to home/dashboard
+      router.push("/")
+    } catch {
+      setError("Could not connect to server. Try again later.")
+    } finally {
+      setLoading(false)
     }
-    setProfileSubmitting(true)
-    // simulate submit
-    await new Promise((r) => setTimeout(r, 900))
-    setProfileSubmitting(false)
-    // here you would redirect or update auth state
-    alert('Profile completed — welcome to Kunjo!')
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-green-50 to-white px-4">
-      <div className="w-full max-w-md bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-6 sm:p-8">
-        <div className="flex flex-col items-center gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center text-white font-bold">
-              K
-            </div>
-            <div>
-              <h1 className="text-lg font-semibold text-gray-800">Kunjo</h1>
-              <p className="text-xs text-gray-500">Campus Marketplace — SUST</p>
-            </div>
-          </div>
-
-          {step === 'entry' && (
-            <div className="w-full mt-2">
-              <label className="text-sm text-gray-700 flex items-center gap-2">
-                <Phone className="w-4 h-4 text-emerald-600" />
-                Phone Number
-              </label>
-              <div className="mt-2 flex gap-2">
-                <input
-                  aria-label="Phone number"
-                  className="flex-1 px-4 py-3 rounded-lg border border-gray-200 placeholder:text-gray-300 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-300"
-                  placeholder="01XXXXXXXXX"
-                  value={phone}
-                  onChange={(e) => setPhone(formatPhoneInput(e.target.value))}
-                  inputMode="numeric"
-                />
-                <button
-                  onClick={handleSendOtp}
-                  disabled={sending}
-                  className="px-4 rounded-lg bg-emerald-600 text-white font-medium hover:bg-emerald-700 disabled:opacity-60"
-                >
-                  {sending ? 'Sending...' : 'Send OTP'}
-                </button>
-              </div>
-            </div>
-          )}
-
-          {step === 'otp' && (
-            <div className="w-full mt-2">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <h2 className="text-sm font-medium text-gray-700">Enter OTP</h2>
-              </div>
-              <p className="text-xs text-gray-500 mt-1">A 6-digit code was sent to {phone}</p>
-
-              <div className="mt-4 flex justify-center gap-2">
-                {otp.map((d, i) => (
-                  <input
-                    key={i}
-                    ref={(el) => { otpRefs.current[i] = el }}
-                    value={d}
-                    onChange={(e) => handleOtpChange(i, e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Backspace' && !otp[i] && i > 0) {
-                        otpRefs.current[i - 1]?.focus()
-                      }
-                    }}
-                    className="w-10 h-12 text-center rounded-lg border border-gray-200 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-300"
-                    inputMode="numeric"
-                    maxLength={1}
-                    aria-label={`OTP digit ${i + 1}`}
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
+      <Card withShine shineColor={["#22c55e", "#8ba316", "#d9de4a"]} className="w-full max-w-xl border-none bg-transparent p-0 shadow-2xl">
+        <MagicCard withShine shineColor={["#22c55e", "#8ba316", "#d9de4a"]} gradientColor="#21b910a5" gradientSize={420} className="rounded-xl p-[1px]">
+          <div className="rounded-[inherit] bg-white dark:bg-neutral-950">
+            <CardHeader className="p-6">
+              <CardTitle className="text-2xl">Sign In</CardTitle>
+              <CardDescription>Sign in with your email and password.</CardDescription>
+            </CardHeader>
+            <CardContent className="p-6">
+              <form className="w-full mt-2 space-y-4" onSubmit={handleSubmit}>
+                <div>
+                  <label className="text-xs text-gray-600">Email</label>
+                  <Input
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@student.sust.edu"
+                    type="email"
+                    required
                   />
-                ))}
-              </div>
+                </div>
 
-              <div className="mt-4 flex justify-center">
-                <button
-                  onClick={handleVerifyOtp}
-                  disabled={verifying}
-                  className="w-full py-3 rounded-lg bg-emerald-600 text-white font-medium hover:bg-emerald-700 disabled:opacity-60"
-                >
-                  {verifying ? 'Verifying...' : 'Verify'}
-                </button>
-              </div>
+                <div>
+                  <label className="text-xs text-gray-600">Password</label>
+                  <Input
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter your password"
+                    type="password"
+                    required
+                  />
+                </div>
 
-              <div className="mt-3 text-center">
-                <button
-                  className="text-sm text-emerald-600 underline"
-                  onClick={() => setStep('entry')}
-                >
-                  Edit Phone Number
-                </button>
-              </div>
-            </div>
-          )}
+                {error && <p className="text-sm text-red-600">{error}</p>}
+                {success && <p className="text-sm text-emerald-600">{success}</p>}
 
-          {step === 'profile' && (
-            <form className="w-full mt-2" onSubmit={handleCompleteProfile}>
-              <div className="flex items-center gap-2">
-                <User className="w-4 h-4 text-emerald-600" />
-                <h2 className="text-sm font-medium text-gray-700">Complete Your Profile</h2>
-              </div>
+                <div>
+                  <RippleButton type="submit" disabled={loading} className="w-full bg-emerald-600 text-white hover:bg-emerald-700">
+                    {loading ? "Signing in..." : "Sign In"}
+                  </RippleButton>
+                </div>
 
-              <div className="mt-3">
-                <label className="text-xs text-gray-600">Name</label>
-                <input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full mt-1 px-3 py-2 rounded-lg border border-gray-200 text-gray-800 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-300"
-                  placeholder="Full name"
-                />
-              </div>
-
-              <div className="mt-3">
-                <label className="text-xs text-gray-600">Email</label>
-                <input
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full mt-1 px-3 py-2 rounded-lg border border-gray-200 text-gray-800 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-300"
-                  placeholder="you@student.sust.edu"
-                  inputMode="email"
-                />
-              </div>
-
-              <div className="mt-3 relative">
-                <label className="text-xs text-gray-600 flex items-center gap-2">
-                  <GraduationCap className="w-3.5 h-3.5 text-emerald-600" /> Department
-                </label>
-                <input
-                  value={departmentQuery || department}
-                  onChange={(e) => {
-                    setDepartmentQuery(e.target.value)
-                    setDepartment('')
-                  }}
-                  onFocus={() => setDepartmentQuery(departmentQuery)}
-                  placeholder="Search department (SWE, CSE, EEE...)"
-                  className="w-full mt-1 px-3 py-2 rounded-lg border border-gray-200 text-gray-800 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-300"
-                />
-                {departmentQuery.length > 0 && (
-                  <ul className="absolute z-10 w-full mt-1 max-h-40 overflow-auto bg-white border border-gray-100 rounded-md shadow-sm">
-                    {filteredDepartments().map((d) => (
-                      <li
-                        key={d}
-                        onClick={() => {
-                          setDepartment(d)
-                          setDepartmentQuery('')
-                        }}
-                        className="px-3 py-2 hover:bg-emerald-50 cursor-pointer text-sm"
-                      >
-                        {d}
-                      </li>
-                    ))}
-                    {filteredDepartments().length === 0 && (
-                      <li className="px-3 py-2 text-sm text-gray-400">No results</li>
-                    )}
-                  </ul>
-                )}
-                {department && (
-                  <div className="mt-2 text-xs text-emerald-700">Selected: {department}</div>
-                )}
-              </div>
-
-              <div className="mt-3">
-                <label className="text-xs text-gray-600">Registration Number</label>
-                <input
-                  value={regNo}
-                  onChange={(e) => validateRegNo(e.target.value)}
-                  className="w-full mt-1 px-3 py-2 rounded-lg border border-gray-200 placeholder:text-gray-300 text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-300"
-                  placeholder="2021331xxx"
-                  inputMode="numeric"
-                  maxLength={10}
-                />
-                {regError ? (
-                  <p className="text-xs text-red-500 mt-1">{regError}</p>
-                ) : (
-                  <p className="text-xs text-gray-400 mt-1">Enter your 10-digit SUST registration number</p>
-                )}
-              </div>
-
-              <div className="mt-5">
-                <button
-                  type="submit"
-                  disabled={profileSubmitting}
-                  className="w-full py-3 rounded-lg bg-emerald-600 text-white font-semibold hover:bg-emerald-700 disabled:opacity-60"
-                >
-                  {profileSubmitting ? 'Submitting...' : 'Complete Profile'}
-                </button>
-              </div>
-            </form>
-          )}
-        </div>
-
-        <div className="mt-6 text-center text-xs text-gray-400">
-          By continuing you agree to Kunjo's terms.
-        </div>
-      </div>
+                <p className="text-center text-sm text-gray-600">
+                  Don&apos;t have an account?{' '}
+                  <Link href="/signup" className="text-emerald-600 font-medium">
+                    Create account
+                  </Link>
+                </p>
+              </form>
+            </CardContent>
+          </div>
+        </MagicCard>
+      </Card>
     </div>
   )
 }
