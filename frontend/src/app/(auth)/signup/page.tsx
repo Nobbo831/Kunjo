@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/ui/date-picker";
 import MagicCard from "@/components/ui/magic-card";
+import { AUTH_CONFIG } from "@/components/auth/auth.constants";
 
 type SignupPayload = {
   email: string;
@@ -32,8 +33,6 @@ type SignupPayload = {
 };
 
 type AuthStep = "signup" | "otp";
-
-const API_BASE_URL = "http://localhost:5000/auth";
 
 export default function SignupPage() {
   const [step, setStep] = useState<AuthStep>("signup");
@@ -70,7 +69,7 @@ export default function SignupPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/signup`, {
+      const response = await fetch(`${AUTH_CONFIG.API_BASE_URL}/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -107,7 +106,7 @@ export default function SignupPage() {
     setIsVerifying(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/verify`, {
+      const response = await fetch(`${AUTH_CONFIG.API_BASE_URL}/verify`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

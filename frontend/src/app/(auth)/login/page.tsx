@@ -7,8 +7,7 @@ import { RippleButton } from "@/components/ui/ripple-button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import MagicCard from "@/components/ui/magic-card"
-
-const API_BASE_URL = "http://localhost:5000/auth"
+import { AUTH_CONFIG } from "@/components/auth/auth.constants"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -35,7 +34,7 @@ export default function LoginPage() {
 
     setLoading(true)
     try {
-      const res = await fetch(`${API_BASE_URL}/login`, {
+      const res = await fetch(`${AUTH_CONFIG.API_BASE_URL}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

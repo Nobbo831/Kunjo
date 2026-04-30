@@ -1,6 +1,8 @@
 import { useState, useCallback } from "react";
 
-const API_BASE_URL = "http://localhost:5000/auth";
+// Read API base from NEXT_PUBLIC_AUTH_BASE so it can be configured via .env
+// Example: NEXT_PUBLIC_AUTH_BASE=http://localhost:5000/auth
+const API_BASE_URL = process.env.NEXT_PUBLIC_AUTH_BASE ?? "http://localhost:5000/auth";
 
 export function useAuthJwt() {
   const saveJwtToCookie = useCallback((jwt: string) => {
