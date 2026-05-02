@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { HeroPanel } from "@/components/auth/hero-panel";
 import { LoginForm } from "@/components/auth/login-form";
 import { SignupForm } from "@/components/auth/signup-form";
-import { KunjoLogoIcon } from "@/components/auth/icons";
+import { KunjoLogoIcon } from "@/components/ui/icons";
 import { BRAND_NAME } from "@/components/auth/auth.constants";
 import { authStyles } from "@/components/auth/auth.styles";
 

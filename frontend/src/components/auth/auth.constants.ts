@@ -1,3 +1,6 @@
+
+//BAAD 
+
 export const AUTH_CONFIG = {
   API_BASE_URL: process.env.NEXT_PUBLIC_AUTH_BASE ?? "http://localhost:5000/auth",
 } as const;

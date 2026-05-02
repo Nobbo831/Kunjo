@@ -32,15 +32,6 @@ export const LockIcon = () => (
   </svg>
 );
 
-export const PasswordIcon = () => (
-  <Image
-    src="https://img.icons8.com/matisse/100/password--v2.png"
-    alt="password"
-    width={15}
-    height={15}
-    style={{ display: "inline-block" }}
-  />
-);
 
 export const EyeIcon = ({ off }: { off?: boolean }) =>
   off ? (
@@ -69,6 +60,35 @@ export const EyeIcon = ({ off }: { off?: boolean }) =>
       <circle cx="12" cy="12" r="3" />
     </svg>
   );
+
+export const ErrorIcon = () => (
+  <svg
+    width="15"
+    height="15"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.8"
+  >
+    <circle cx="12" cy="12" r="10" />
+    <path d="M12 7v6" />
+    <path d="M12 17h.01" />
+  </svg>
+);
+
+export const SuccessIcon = () => (
+  <svg
+    width="15"
+    height="15"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.8"
+  >
+    <circle cx="12" cy="12" r="10" />
+    <path d="m8.5 12.5 2.5 2.5L15.5 10" />
+  </svg>
+);
 
 export const UserIcon = () => (
   <svg
@@ -167,6 +187,60 @@ export const KunjoLogoIcon = () => (
     <path d="M6 12v5c3 3 9 3 12 0v-5" />
   </svg>
 );
+// export const PasswordIcon = () => (
+//   <Image
+//     src="https://img.icons8.com/matisse/100/password--v2.png"
+//     alt="password"
+//     width={20}
+//     height={15}
+//     style={{ display: "inline-block" }}
+//   />
+// );
+export const PasswordIcon = () => (
+  <Image
+    src="https://img.icons8.com/plasticine/100/key.png"
+    alt="password"
+    width={32}
+    height={15}
+    style={{ display: "inline-block" }}
+  />
+);
 
-// Re-export some UI icons so auth components can import from ./icons
-export { ProfileIcon, GmailIcon, LocationIcon } from "@/components/ui/icons";
+export const ProfileIcon = () => (
+  <Image
+    src="https://img.icons8.com/plasticine/100/user-male-circle.png"
+    alt="profile"
+    width={30}
+    height={15}
+    style={{ display: "inline-block" }}
+  />
+);
+
+// export const GmailIcon = () => (
+//   <Image
+//     src="https://img.icons8.com/plasticine/100/gmail-new.png"
+//     alt="gmail"
+//     width={20}
+//     height={15}
+//     style={{ display: "inline-block" }}
+//   />
+// );
+export const GmailIcon = () => (
+  <Image
+    src="https://img.icons8.com/plasticine/100/add-open-envelope.png"
+    alt="gmail"
+    width={30}
+    height={15}
+    style={{ display: "inline-block" }}
+  />
+);
+
+export const LocationIcon = () => (
+  <Image
+    src="https://img.icons8.com/plasticine/100/address.png"
+    alt="location"
+    width={25}
+    height={15}
+    style={{ display: "inline-block" }}
+  />
+);

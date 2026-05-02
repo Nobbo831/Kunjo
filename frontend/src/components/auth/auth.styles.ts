@@ -1,3 +1,7 @@
+
+
+//baad 
+
 export const authStyles = `
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
 
@@ -12,7 +16,7 @@ export const authStyles = `
 
   /* ── The whole card: FIXED size, never changes ── */
   .lsf-card {
-    width: 980px;
+    width: 820px;
     height: 640px;
     display: flex;
     border-radius: 22px;
@@ -28,7 +32,7 @@ export const authStyles = `
   /* ── Hero half ── */
   .lsf-hero {
     position: relative;
-    width: 390px; flex-shrink: 0;
+    width: 360px; flex-shrink: 0;
     overflow: hidden;
     background: #052e16;
   }

@@ -4,6 +4,18 @@ import { useState, useCallback } from "react";
 // Example: NEXT_PUBLIC_AUTH_BASE=http://localhost:5000/auth
 const API_BASE_URL = process.env.NEXT_PUBLIC_AUTH_BASE ?? "http://localhost:5000/auth";
 
+function normalizeLoginError(message?: string | null) {
+  if (!message) {
+    return "Invalid credential";
+  }
+
+  if (message.toLowerCase().includes("validation error")) {
+    return "Invalid credential";
+  }
+
+  return message;
+}
+
 export function useAuthJwt() {
   const saveJwtToCookie = useCallback((jwt: string) => {
     const maxAge = 60 * 60 * 24 * 7;
@@ -40,7 +52,7 @@ export function useLogin() {
         const data = await res.json().catch(() => null);
 
         if (!res.ok) {
-          setError(data?.message ?? "Login failed. Check credentials.");
+          setError(normalizeLoginError(data?.message));
           return null;
         }
 

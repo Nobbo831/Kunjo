@@ -17,9 +17,10 @@ export const RippleButton = React.forwardRef<
     {
       className,
       children,
-      rippleColor = "#8de2767a",
+      rippleColor = "rgba(15,150,65,0.22)",
       duration = "600ms",
       onClick,
+      style,
       ...props
     },
     ref
@@ -66,11 +67,16 @@ export const RippleButton = React.forwardRef<
     return (
       <button
         className={cn(
-          "bg-background text-primary relative flex cursor-pointer items-center justify-center overflow-hidden rounded-lg border-2 px-4 py-2 text-center",
+          "relative flex cursor-pointer items-center justify-center overflow-hidden rounded-lg border-2 px-4 py-2 text-center",
           className
         )}
         onClick={handleClick}
         ref={ref}
+        style={{
+          backgroundColor: "#147337",
+          color: "white",
+          ...style,
+        }}
         {...props}
       >
         <div className="relative z-10">{children}</div>
