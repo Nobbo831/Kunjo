@@ -12,6 +12,9 @@ const envSchema = z.object({
   OTP_RESEND_COOLDOWN: z.coerce.number().default(30),
   RESEND_API_KEY: z.string().min(1),
   EMAIL_FROM: z.string().default("no-reply@kunjo.com"),
+  CLOUDINARY_CLOUD_NAME: z.string(),
+  CLOUDINARY_API_KEY: z.string(),
+  CLOUDINARY_API_SECRET: z.string(),
 });
 
 const _env = envSchema.safeParse(process.env);
