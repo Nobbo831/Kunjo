@@ -1,5 +1,6 @@
 import { StoreRepository } from "./store.repository.js";
 import { CreateStoreDTO } from "./store.types.js"
+import { deleteFromCloudinary } from "../../utils/deleteFromCloudinary.js";
 
 export class StoreService {
   static async createStore(data: CreateStoreDTO) {
@@ -28,7 +29,10 @@ export class StoreService {
 
     if (!Store) throw new Error("Store not found");
     if (Store.user_id !== user_id) throw new Error("Unauthorized");
-
+    if (Store.logo_public_id) {
+      await deleteFromCloudinary(Store.logo_public_id);
+    }
+    
     await StoreRepository.delete(id);
   }
 }
